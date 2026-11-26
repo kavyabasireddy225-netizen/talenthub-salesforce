@@ -1,58 +1,88 @@
-# Salesforce DX Project
+TalentHub – Salesforce Recruiting App
 
-Salesforce DX is a development approach that brings source-driven development, team collaboration, and continuous integration to the Salesforce Platform. Instead of working directly in an org through a web browser, you work with metadata as source files in a local DX project, track changes in version control, and deploy through automated processes.
+A recruiting and applicant-tracking app built on the Salesforce Platform. It covers data modeling, security, declarative automation and data quality.
 
-This project template gets you started with the tools and structure you need to build Salesforce applications using source control, scratch orgs, and the Salesforce CLI.
+Portfolio project built in a Salesforce Developer Edition org with fictional data.
 
-## Prerequisites
+Business problem
 
-Before you start, make sure you have:
+A company tracks hiring in spreadsheets. Recruiters lose track of candidates, hiring managers can't see progress, and salary data isn't protected. TalentHub manages positions, candidates, job applications and interviews in one place, with the right security and automation.
 
-- **Salesforce CLI** - Download from [developer.salesforce.com/tools/salesforcecli](https://developer.salesforce.com/tools/salesforcecli). See [Install Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm) for details.
-- **VS Code with Salesforce Extension Pack** - See [Installation Instructions](https://developer.salesforce.com/docs/platform/sfvscode-extensions/guide/install.html) for details. Includes the Agentforce Vibes extension.
-- **A development org** - Sign up for a free Developer Edition org [here](https://developer.salesforce.com/signup).
-- **Dev Hub enabled** (optional, required to create scratch orgs) - You can enable Dev Hub in your development org under Setup > Dev Hub.  See [Provide Developers Access to Salesforce DX Tools](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_dx_tools.htm).
+Data model
+Position (1) ──< Job Application >── (1) Candidate
+                      │
+                      └──< Interview
+Object	Purpose	Key relationships
+Position	An open job	Master of Job Application
+Candidate	A person applying	Master of Job Application
+Job Application	Junction object (many-to-many)	Master-detail to Position and Candidate
+Interview	One interview round	Required lookup to Job Application
 
-## Project Structure
+Design decision: a junction object can't be the master in another master-detail relationship. Interview therefore uses a required lookup with "Don't allow deletion", and the interview roll-ups are rebuilt with record-triggered Flows.
 
-Your DX project follows this structure:
+Key fields
 
-- **`force-app/main/default/`** - Your metadata source files live in this default package directory. You can configure additional package directories in the `sfdx-project.json` file.
-- **`config/`** - Scratch org definitions and project settings
-- **`scripts/`** - Automation scripts for common tasks
-- **`sfdx-project.json`** - Project manifest that defines package directories, namespace, API version, and other project-level settings
+Position: Status, Department, Location, Hiring Manager, Min/Max Pay, Open/Close Date, Days Open (formula), Total Applications and Hired Count (roll-up summaries), record types Technical / Non-Technical
+Candidate: Auto-number name (CAND-0000), unique Email, Phone, Source, Years of Experience
+Job Application: Status, Rejection Reason, Offer Amount, Applied Date, Interview Count, Average Rating, Candidate Full Name (cross-object formula)
+Interview: Interviewer, Date, Type, Rating, Rating Value (formula), Feedback, Recommendation
+Features
+User experience
+TalentHub Lightning app with custom tabs
+Custom Lightning record page for Position, with Highlights Panel, Tabs and Dynamic Forms field sections
+Path on Position Status, with key fields and Guidance for Success for each stage (separate paths for each record type)
+Conditional field visibility: Max Pay appears only when Status = Open
+Custom list views (e.g. All Job Applications with Position, Candidate and Status columns)
+Data quality
+Validation rule	Object	Rule
+Close_Date_After_Open_Date	Position	Close Date can't be before Open Date
+Min_Pay_Not_Above_Max_Pay	Position	Min Pay can't exceed Max Pay
+Rejection_Reason_Required	Job Application	Reason required when Status = Rejected
+Offer_Amount_Required	Job Application	Offer Amount required when Status = Offer Extended
+No_Apply_To_Closed_Position	Job Application	No new applications to Closed/Filled positions
 
-See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm).
+Duplicate management: a matching rule on Candidate (Email OR (Last Name AND Phone)) and a duplicate rule that blocks likely duplicates. Exact email duplicates are blocked separately by the unique Email field.
 
-## Get Started
+Security model
+Object	Org-wide default	Reason
+Position	Public Read Only	Everyone can see open jobs
+Candidate	Private	Personal data
+Job Application	Controlled by Parent	Inherits access from Position and Candidate
+Interview	Private	Interview feedback is sensitive
 
-Ready to start developing? The [Get Started with Salesforce DX](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_get_started_dx.htm) guide walks you through your first project, from creating a scratch org to creating a simple Apex class or LWC to deploying your code to a sandbox.
+Access is opened up through the role hierarchy, sharing rules and permission sets (least privilege).
 
-## Common Salesforce CLI Commands
+Automation
+Automation	Type	What it does
+Position Approval	Approval Process	A New position with pay set can be submitted. The record locks and Status becomes Pending Approval. On approval → Open and Open Date = today. On rejection or recall → New, and the owner gets an email alert
+Candidate Hired	Record-triggered Flow (after save)	When an application changes to Hired: sets the Position to Filled with a Close Date, rejects all other open applications (Position Filled) and emails the hiring manager. Fault paths email the admin
+Interview Totals	Record-triggered Flows (create/update and delete)	Keeps Interview Count and Average Rating on Job Application up to date, replacing roll-ups that a lookup can't have
 
-Here are common CLI commands that you'll use the most:
+Flow design notes
 
-- `sf org login web`: Authorize an org
-- `sf org open`: Open your org in a browser
-- `sf org create scratch`: Create a scratch org
-- `sf project deploy start`: Deploy metadata to your org
-- `sf project retrieve start`: Retrieve metadata from your org
-- `sf template generate <artifact>`: Scaffold new components, such as Apex classes and triggers, LWC components, Lightning apps, and more
-- `sf apex <command>`: Run Apex tests, run anonymous Apex blocks, and view logs
-- `sf data <command>`: Work with test data
-- `sf alias <command>`: Manage org aliases
-- `sf config <command>`: Configure CLI settings
+Uses a single conditional Update Records element, not DML inside a loop, so it's bulk-safe
+Runs only when a record is updated to meet the condition, which stops repeat runs
+Divide-by-zero guard on the average calculation
+Fault paths send {!$Flow.FaultMessage} to the admin
+Testing
+Scenario	Expected result	✓
+Mark an application Hired	Position → Filled, other open applications → Rejected, email sent	✅
+Already-rejected application on the same position	Left unchanged	✅
+Edit an unrelated field on a hired application	Flow doesn't run again	✅
+Submit a position without Max Pay	Blocked by the approval entry criteria	✅
+Approve / reject a position	Status → Open / New; record unlocked	✅
+Create a candidate with the same last name and phone as an existing one	Blocked by the duplicate rule	✅
+Reject an application without a reason	Validation error	✅
+Screenshots
 
-## Use Agentforce Vibes to Build Lightning Apps
 
-Transform your ideas into custom Lightning apps that extend CRM workflows directly in Lightning Experience. Through natural conversations with Agentforce Vibes, implement custom objects and fields, complex business logic, and dynamic UI components. See [Build a Lightning App Using Agentforce Vibes](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/lexapp-overview.html).
+Deploying to another org
+bash
+sf org login web --alias target-org
+sf project deploy start --manifest manifest/package.xml --target-org target-org
 
-## Additional Resources
+Some settings must be configured by hand after deployment: users and managers, Deliverability (All email), and approval process activation.
 
-- [Agentforce Vibes Developer Guide](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/einstein-overview.html)
-- [Salesforce CLI Installation Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/)
-- [Salesforce CLI Plugin Development Guide](https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/conceptual-overview.html)
-- [Salesforce VS Code Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
+Skills demonstrated
 
+Data modeling (master-detail, junction objects, lookups, roll-ups, formulas) · Lightning App Builder · Dynamic Forms · Path · Validation rules · Duplicate management · Org-wide defaults and sharing · Approval processes · Record-triggered Flows · Fault handling · Salesforce CLI and Git source control
