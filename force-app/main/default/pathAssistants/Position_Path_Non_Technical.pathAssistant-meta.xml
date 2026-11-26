@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Position_Title__c</entityName>
+    <fieldName>Status__c</fieldName>
+    <masterLabel>Position Path - Non-Technical</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>Close_Date__c</fieldNames>
+        <fieldNames>Hiring_Manager__c</fieldNames>
+        <picklistValueName>Cancelled</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Close_Date__c</fieldNames>
+        <fieldNames>Total_Applications__c</fieldNames>
+        <picklistValueName>Closed</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Close_Date__c</fieldNames>
+        <fieldNames>Days_Open__c</fieldNames>
+        <fieldNames>Hired_Count__c</fieldNames>
+        <picklistValueName>Filled</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Department__c</fieldNames>
+        <fieldNames>Hiring_Manager__c</fieldNames>
+        <fieldNames>Location__c</fieldNames>
+        <fieldNames>Job_Description__c</fieldNames>
+        <picklistValueName>New</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Days_Open__c</fieldNames>
+        <fieldNames>Open_Date__c</fieldNames>
+        <fieldNames>Total_Applications__c</fieldNames>
+        <fieldNames>Location__c</fieldNames>
+        <picklistValueName>Open</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Hiring_Manager__c</fieldNames>
+        <fieldNames>Max_Pay__c</fieldNames>
+        <fieldNames>Min_Pay__c</fieldNames>
+        <fieldNames>Department__c</fieldNames>
+        <picklistValueName>Pending Approval</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>Non_Technical</recordTypeName>
+</PathAssistant>

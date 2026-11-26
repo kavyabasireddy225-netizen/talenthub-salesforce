@@ -1,0 +1,6 @@
+Hi,
+
+Your position "{!Position__c.Name}" was not approved.
+Please review the details and resubmit.
+
+Link: {!Position__c.Link}

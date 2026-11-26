@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Position_Title__c</entityName>
+    <fieldName>Status__c</fieldName>
+    <masterLabel>Position Path</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>Close_Date__c</fieldNames>
+        <fieldNames>Hiring_Manager__c</fieldNames>
+        <info>&lt;p&gt;Use Cancelled only if the position was created by mistake or will never be opened.&lt;/p&gt;&lt;p&gt; • Do not cancel a position that has active applications. Use Closed instead.&lt;/p&gt;&lt;p&gt; • Add a note in Chatter explaining the reason.&lt;/p&gt;</info>
+        <picklistValueName>Cancelled</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Close_Date__c</fieldNames>
+        <fieldNames>Total_Applications__c</fieldNames>
+        <info>&lt;p&gt;Use Closed when the hiring process has ended without a hire (for example, the budget was removed).&lt;/p&gt;&lt;p&gt; • Enter the Close Date.&lt;/p&gt;&lt;p&gt; • Make sure all remaining applicants have been informed.&lt;/p&gt;&lt;p&gt; • Add a note in Chatter explaining why the position was closed.&lt;/p&gt;</info>
+        <picklistValueName>Closed</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Close_Date__c</fieldNames>
+        <fieldNames>Hired_Count__c</fieldNames>
+        <fieldNames>Days_Open__c</fieldNames>
+        <info>&lt;p&gt;Congratulations, the position is filled!&lt;/p&gt;&lt;p&gt; • Confirm the hired candidate’s Job Application status is “Hired”.&lt;/p&gt;&lt;p&gt; • Other open applicants are automatically rejected by the system.&lt;/p&gt;&lt;p&gt; • Notify HR to start onboarding.&lt;/p&gt;</info>
+        <picklistValueName>Filled</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Department__c</fieldNames>
+        <fieldNames>Hiring_Manager__c</fieldNames>
+        <fieldNames>Location__c</fieldNames>
+        <fieldNames>Job_Description__c</fieldNames>
+        <info>&lt;p&gt;Fill in the basics before anything else:&lt;/p&gt;&lt;p&gt; • Pick the correct Department and Hiring Manager.&lt;/p&gt;&lt;p&gt; • Write a clear Job Description with responsibilities and requirements.&lt;/p&gt;&lt;p&gt; • Confirm the Location (Remote or office).&lt;/p&gt;&lt;p&gt; When ready, set Min/Max Pay and move the status to Pending Approval.&lt;/p&gt;</info>
+        <picklistValueName>New</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Days_Open__c</fieldNames>
+        <fieldNames>Open_Date__c</fieldNames>
+        <fieldNames>Total_Applications__c</fieldNames>
+        <fieldNames>Location__c</fieldNames>
+        <info>&lt;p&gt;The position is approved and live:&lt;/p&gt;&lt;p&gt; • Share the job description on LinkedIn, job boards, and the career site.&lt;/p&gt;&lt;p&gt; • Ask the team for employee referrals.&lt;/p&gt;&lt;p&gt; • Review new applications within 2 business days.&lt;/p&gt;&lt;p&gt; • If Total Applications is low after 2 weeks, consider updating the job description or pay range.&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;</info>
+        <picklistValueName>Open</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Max_Pay__c</fieldNames>
+        <fieldNames>Min_Pay__c</fieldNames>
+        <fieldNames>Hiring_Manager__c</fieldNames>
+        <fieldNames>Department__c</fieldNames>
+        <info>&lt;p&gt;Before submitting for approval:&lt;/p&gt;&lt;p&gt; • Make sure Min Pay and Max Pay are filled in and match the company pay bands.&lt;/p&gt;&lt;p&gt; • Min Pay cannot be higher than Max Pay.&lt;/p&gt;&lt;p&gt; • Click “Submit for Approval”. The record will be locked until the manager approves or rejects it.&lt;/p&gt;</info>
+        <picklistValueName>Pending Approval</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>Technical</recordTypeName>
+</PathAssistant>

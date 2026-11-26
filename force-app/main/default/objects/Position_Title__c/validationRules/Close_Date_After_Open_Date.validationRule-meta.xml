@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Close_Date_After_Open_Date</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(NOT(ISBLANK(Close_Date__c)), Close_Date__c &lt; Open_Date__c)</errorConditionFormula>
+    <errorDisplayField>Close_Date__c</errorDisplayField>
+    <errorMessage>Close Date must be on or after Open Date.</errorMessage>
+</ValidationRule>
