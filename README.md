@@ -73,7 +73,7 @@ Submit a position without Max Pay	Blocked by the approval entry criteria	✅
 Approve / reject a position	Status → Open / New; record unlocked	✅
 Create a candidate with the same last name and phone as an existing one	Blocked by the duplicate rule	✅
 Reject an application without a reason	Validation error	✅
-Screenshots
+
 
 
 Deploying to another org
